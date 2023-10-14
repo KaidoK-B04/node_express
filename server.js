@@ -17,6 +17,7 @@ app.use(cors());
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "/public")));
+app.use("/subdir", express.static(path.join(__dirname, "/public")));
 
 //Cors stuff
 const whitelist = ["http://localhost:3500", "http://127.0.0.1:5500"];
@@ -38,19 +39,10 @@ const corsOptions =
 app.use(cors(corsOptions));
 
 //Routes
-app.get("^/$|/index(.html)?", (req, res) =>
-{
-  res.sendFile(path.join(__dirname, "view", "index.html"))
-});
+app.use(("/subdir"), require("./routes/subdir"));
+app.use("/", require("./routes/root"));
+app.use("/employees", require("./routes/api/employees"));
 
-app.get("/new-page(.html)?", (req, res) =>
-{
-  res.sendFile(path.join(__dirname, "view", "new-page.html"))
-});
-app.get("/old-page(.html)?", (req, res) =>
-{
-  res.redirect(301, "/new-page.html")
-});
 app.all("*", (req, res) =>
 {
   res.status(404);
